@@ -34,5 +34,65 @@ Posts.findById(id)
 })
 })
 
+postRouter.post('/', (req, res)=>{
+    const postBody = req.body;
+    if(!postBody.title || !postBody.contents){
+        res.status(400).json({
+            message: "Please provide title and contents for the post"
+        })
+    } else {
+        Posts.insert(postBody)
+        .then(({id}) =>{
+            return Posts.findById(id)
+        })
+        .then(newPost =>{
+            res.status(201).json(newPost)
+        })
+        .catch(err =>{
+            res.status(500).json({
+                message: "There was an error while saving the post to the database"
+            })
+        })
+    }
+})
+
+postRouter.put('/:id', (req, res)=>{
+    const postBody = req.body;
+    if(!postBody.title || !postBody.contents){
+        res.status(400).json({
+            message: "Please provide title and contents for the post"
+        })
+    } else {
+        Posts.findById(req.params.id)
+        .then(post =>{
+            if(!post){
+                res.status(404).json({
+                    message: "The post with the specified ID does not exist"
+                })
+            } else{
+                 return Posts.update(req.params.id, postBody)
+            }
+        })
+        .then(data =>{
+            if(data){
+                return Posts.findById(req.params.id)
+            }
+        })
+        .then(post =>{
+            res.json(post)
+        })
+        .catch(err =>{
+            res.status(500).json({
+                message: "The post information could not be modified"
+            })
+        })
+    }
+})
+
+postRouter.delete('/', (req, res)=>{
+    
+})
+
+
 
 module.exports = postRouter
