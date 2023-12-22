@@ -110,6 +110,24 @@ postRouter.delete('/:id', async (req, res)=>{
  }
 })
 
+postRouter.get('/:id/comments', async (req, res)=>{
+ try{
+    const isId = await Posts.findById(req.params.id)
+    if(!isId){
+        res.status(404).json({
+            message: "The post with the specified ID does not exist"
+        })
+    } else{
+        const postComments = await Posts.findPostComments(req.params.id)
+        res.json(postComments)
+    }
 
+ } catch(err){
+    res.status(500).json({
+        message: "The comments information could not be retrieved"
+    })
+ }
+
+})
 
 module.exports = postRouter
